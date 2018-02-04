@@ -1,6 +1,6 @@
 # Facial Recognition Project for ECE196
 
-Author: Simon Fong & Tyler Deng
+Author: Will Chen, Simon Fong, Tyler Deng
 
 # TODO
 [Install Keras on RPI 3](https://medium.com/@paroskwan/layman-installation-guide-for-keras-and-tensorflow-on-rpi-3-38b84f3e59dc)  
