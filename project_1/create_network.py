@@ -20,18 +20,20 @@ Modify this code to write a LeNet with the following requirements:
 
 """
 
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D
 from keras.models import Model
 
 # This returns a tensor
-inputs = Input(shape=(784,))
+inputs = Input(shape=(32,32,1))
+x = Conv2D(6,(5,5), activation='sigmoid')(inputs)
+x = MaxPooling2D((2,2),strides=(2,2))(x)
+x = Conv2D(16,(5,5), activation='sigmoid')(x)
+x = MaxPooling2D((2,2),strides=(2,2))(x)
+x = Conv2D(120,(5,5), activation='sigmoid')(x)
 
 # a layer instance is callable on a tensor, and returns a tensor
-x = Dense(64, activation='relu')(inputs)
-x = Dense(64, activation='relu')(x)
+x = Dense(84, activation='tanh')(x)
 predictions = Dense(10, activation='softmax')(x)
-
-# This creates a model that includes
 # the Input layer and three Dense layers
 model = Model(inputs=inputs, outputs=predictions)
 
