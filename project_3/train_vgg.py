@@ -9,11 +9,11 @@ Use this as a template to:
 4. save weights
 """
 
-from tensorflow.keras.python.keras.models import Model
-from tensorflow.keras.python.keras.applications.vgg16 import VGG16
-from tensorflow.keras.python.keras import optimizers
-from tensorflow.keras.python.keras.layers import Dropout, Flatten, Dense
-from tensorflow.keras.python.keras.utils.np_utils import to_categorical
+from keras.models import Model
+from keras.applications.vgg16 import VGG16
+from keras import optimizers
+from keras.layers import Dropout, Flatten, Dense
+from keras.utils.np_utils import to_categorical
 import numpy as np
 import glob
 import os
@@ -22,8 +22,8 @@ import random
 
 IMG_H, IMG_W, NUM_CHANNELS = 224, 224, 3
 MEAN_PIXEL = np.array([104., 117., 123.]).reshape((1,1,3))
-TRAIN_DIR = './images/train'  #TODO
-VAL_DIR = './images/validation'  #TODO
+TRAIN_DIR = '../images/train'  #TODO
+VAL_DIR = '../images/validation'  #TODO
 NUM_EPOCHS = 5  #TODO
 BATCH_SIZE = 16
 NUM_CLASSES = 19  #TODO
