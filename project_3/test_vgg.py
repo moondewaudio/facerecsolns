@@ -13,8 +13,8 @@ import glob, os, cv2
 from keras.models import Model, load_model
 from keras.utils.np_utils import to_categorical
 
-TEST_DIR = './images/test'  #TODO
-MODEL_PATH = './side_hoe_number_2.h5' #TODO
+TEST_DIR = '../images/test'  #TODO
+MODEL_PATH = './face_weifhts.h5' #TODO
 IMG_H, IMG_W, NUM_CHANNELS = 224, 224, 3
 MEAN_PIXEL = np.array([104., 117., 123.]).reshape((1,1,3))
 BATCH_SIZE = 16
