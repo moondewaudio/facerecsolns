@@ -1,11 +1,16 @@
 import cv2
 import numpy as np
 from keras.models import load_model
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 
 app = Flask(__name__)
 
 # Read saved weights and name it model
+def get_model():
+    model = getattr(g, 'model', None)
+    if model is None:
+        model = g.model = load_model('face_weights.h5')
+    return model
 
 def classify(file_path):
     """
@@ -14,7 +19,7 @@ def classify(file_path):
     :param model: model to use
     :return: classification results label and confidence
     """
-    model = load_model('face_weights.h5')
+    #model = load_model('face_weights.h5')
     img_height, img_width, num_channel = 224, 224, 3
     mean_pixel = np.array([104., 117., 123.]).reshape((1, 1, 3))
 
@@ -33,6 +38,7 @@ def classify(file_path):
     # TODO: use network to predict x, get label and confidence of prediction
     # TODO: label is a number, which correspond to the same number you give to the folder when you organized data
     # CHECK
+    model = get_model()
     predictions = model.predict(x)[0]
     label = np.argmax(predictions)
     
