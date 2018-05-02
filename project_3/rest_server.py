@@ -6,7 +6,6 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # Read saved weights and name it model
-model = load_model('side_hoe_number_2.h5')
 
 def classify(file_path):
     """
@@ -15,6 +14,7 @@ def classify(file_path):
     :param model: model to use
     :return: classification results label and confidence
     """
+    model = load_model('face_weights.h5')
     img_height, img_width, num_channel = 224, 224, 3
     mean_pixel = np.array([104., 117., 123.]).reshape((1, 1, 3))
 
@@ -50,7 +50,7 @@ def classify(file_path):
         name = "Unknown"
     
     prediction = {'label': name,
-                  'confidence': conf}
+                  'confidence': float(conf)}   #Convert to be JSON serializable
 
     return prediction
 
@@ -66,7 +66,7 @@ def save_image():
     return jsonify(classify(temp_image_name))
         
 def main():
-    app.run(host='0.0.0.0', port=8196)
+    app.run(host='0.0.0.0', port=8080, threaded=False)
 
 
 if __name__ == "__main__":
