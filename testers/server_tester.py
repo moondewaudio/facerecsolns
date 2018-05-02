@@ -1,8 +1,8 @@
 import time,cv2, base64, requests
+from sys import argv
 
-    
-def request_from_server():
-    URL = "http://52.36.100.249:8080/predict"
+   
+def request_from_server(url):
     temp_image_name = 'test_image.jpg'
 
     # Reopen image and encode in base64
@@ -14,7 +14,7 @@ def request_from_server():
     PARAMS = {'file':image_64_encode}
      
     # Dending get request and saving the response as response object
-    r = requests.get(url = URL, params = PARAMS)
+    r = requests.get(url = url, params = PARAMS)
      
     # Print response
     data = r.json()
@@ -23,7 +23,11 @@ def request_from_server():
 
 
 def main():
-    response = request_from_server()
+    url = "http://52.36.100.249:8080/predict"
+    if(len(argv) > 1):
+        url = "http://{}:8080/predict".format(argv[1])
+    print(url)
+    response = request_from_server(url)
     print(response)
 if __name__ == '__main__':
     main()
