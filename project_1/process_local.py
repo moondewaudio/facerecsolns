@@ -5,16 +5,16 @@ Author: W Chen
 Prerequisite: You need to install OpenCV before running this code
 The code here is an example of what you can write to print out 'Hello World!'
 Now modify this code to process a local image and do the following:
-1. read geisel-hr.jpg
-2. convert color to gray scale
-3. resize to half of its original dimensions
-4. draw a box at the center the image with size 10x10
-5. save image with a new name to local directory
+1. Read geisel.jpg
+2. Convert color to gray scale
+3. Resize to half of its original dimensions
+4. Draw a box at the center the image with size 100x100
+5. Save image with the name, "geisel-bw-rectangle.jpg" to the local directory
 All the above steps should be in one function called process_image()
 """
 import cv2
 
-# TODO: edit this function
+# TODO: Edit this function
 def process_image():
 	image = cv2.imread("geisel.jpg",0)
 	cv2.imshow("geisel",image)
@@ -37,11 +37,12 @@ def hello_world():
 	return
 
 
+# TODO: Call process_image()
 def main():
 	#hello_world()
 	process_image()
 	return
 
 
-if __name__ == '__main__':
+if(__name__ == '__main__'):
     main()
