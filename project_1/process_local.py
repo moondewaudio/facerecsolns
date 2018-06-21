@@ -12,6 +12,8 @@ Now modify this code to process a local image and do the following:
 5. Save image with the name, "geisel-bw-rectangle.jpg" to the local directory
 All the above steps should be in one function called process_image()
 """
+
+# TODO: Import OpenCV
 import cv2
 
 # TODO: Edit this function
@@ -31,15 +33,15 @@ def process_image():
 	cv2.imwrite("geisel-bw-rectangle.jpg", resized)
 	return
 
-
+# Just prints 'Hello World! to screen.
 def hello_world():
-	print 'Hello World!'
+	print('Hello World!')
 	return
 
 
 # TODO: Call process_image()
 def main():
-	#hello_world()
+	hello_world()
 	process_image()
 	return
 
