@@ -114,7 +114,6 @@ def predict():
             print(request.form)
             abort(400)    
         image = request.form['image']
-        data = {'data':'foo'}
         
     starter = image.find(',')
     image_data = image[starter+1:]
