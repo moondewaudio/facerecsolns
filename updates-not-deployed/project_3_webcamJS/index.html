@@ -4,6 +4,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <style>
         input{width: 300px}
+        .data {
+            padding: 5px; 
+            border-left: 1px solid gray;
+            font-family: sans-serif;
+            margin: 0px;
+        }
+        .data_container {
+            padding: 5px; 
+            width: 500px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            font-family: sans-serif;
+        }
+        h1 {
+            font-family: sans-serif;
+        }
+        p {
+            font-family: sans-serif;
+        }
+        body {
+            font-family: sans-serif;
+        }
     </style>
   </head>
   <body onload="init();">
@@ -20,6 +42,16 @@
         <input id="endpoint" type=text placeholder="http:localhost:8080/predict">
         <button onclick="setEndpoint()">Set Endpoint</button>
     </p>
+    <p class="data_container">
+        Endpoint <span id="endpoint_output" class="data">Waiting for response...</span>
+    </p>
+    <p class="data_container">
+        Response <span id="response_output" class="data">Waiting for response...</span>
+    </p>
+    <p class="data_container">
+        Status <span id="status" class="data">None</span>
+    </p>
+     
     <video onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay></video>
   <p>
 
@@ -78,6 +110,10 @@
         // drawing in it
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
+        
+        var endpoint = window.location.href + 'predict';
+        $('#endpoint').attr('placeholder',endpoint);
+        $('#endpoint_output').text(endpoint);
       }
       
       var imageURI;
@@ -89,16 +125,24 @@
         download = document.getElementById("download");
         download.href = imageURI;
       }
-      var endpoint = "http://localhost:8080/predict";
+      var endpoint = window.location.href + 'predict';
       function post_request() {
         console.log("Posting");
         url = "http://mothakes.requestcatcher.com/";
         url = endpoint;
+        console.log(url);
         data = {"image": imageURI};
         console.log(data);
+        $('#status').text('Sending request to ' + url + ' ...');
+        $('#status').css('background-color', 'DodgerBlue');
+        $('#status').css('color', 'white');
         $.post(url,data, function(data, status){
             //alert("Data: " + data + "\nStatus: " + status);
             console.log(data);
+            setResponseBox(data);
+            $('#status').text('Response received.');
+            $('#status').css('background-color', 'MediumSeaGreen');
+            $('#status').css('color', 'white');
         });
       }
       
@@ -107,6 +151,11 @@
         text = document.getElementById("endpoint");
         console.log(text.value);
         endpoint = text.value;
+        $('#endpoint_output').text(text.value);
+      }
+      
+      function setResponseBox(value){
+        $('#response_output').text(value.label);
       }
 
   </script>
