@@ -109,12 +109,14 @@ def predict():
     
     # This extracts the image data from the request 
     if(request.method == 'POST'):
-        
-        if('image' not in request.form):
+        if('image' not in request.form and 'image' not in request.json):
             print(request.form)
-            abort(400)    
-        image = request.form['image']
-        
+            abort(400)
+        try:    
+            image = request.json['image']
+        except(TypeError):
+            image = request.form['image']
+
     starter = image.find(',')
     image_data = image[starter+1:]
     
