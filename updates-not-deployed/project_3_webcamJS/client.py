@@ -1,3 +1,13 @@
+"""
+ECE 196 Face Recognition Project
+Author: Will Chen, Simon Fong
+
+What this script should do:
+1. Start running the camera.
+2. Detect a face, display it, and get confirmation from user.
+3. Send it for classification and fetch result.
+4. Show result on face display.
+"""
 import time,cv2, base64, requests
 from picamera import PiCamera
 from picamera.array import PiRGBArray
