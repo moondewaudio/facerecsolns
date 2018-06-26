@@ -41,12 +41,12 @@ def request_from_server(img):
     payload = {'image':image_64_encode}
      
     # Sending post request and saving the response as response object
-    r = requests.post(url = URL, json = payload)
+    response = requests.post(url = URL, json = payload)
      
-    # Print response
-    data = r.json()
+    # Get prediction from response
+    prediction = response.json()
 
-    return data
+    return prediction
 
 
 def main():
