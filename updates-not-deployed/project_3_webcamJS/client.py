@@ -17,8 +17,19 @@ CASCADE_PATH = "/home/pi/opencv-2.4.13.4/data/haarcascades/haarcascade_frontalfa
 FONT = cv2.FONT_HERSHEY_SIMPLEX
     
 def request_from_server(img):
+    """ 
+    Sends image to server for classification.
+    
+    :param img: Image array to be classified.
+    :returns: Returns a dictionary containing label and cofidence.
+    """
+    # URL or PUBLIC DNS to your server
     URL = "http://192.168.43.113:8080/predict"
+
+    # File name so that it can be temporarily stored.
     temp_image_name = 'temp.jpg'
+
+    # TODO: Save image with name stored in 'temp_image_name'
     cv2.imwrite(temp_image_name,img)
 
     # Reopen image and encode in base64
@@ -50,17 +61,20 @@ def main():
     camera.resolution = (WIDTH, HEIGHT)
     rawCapture = PiRGBArray(camera, size=(WIDTH, HEIGHT))
 
-    # warm up
+    # Warm up camera
     print 'Let me get ready ... 2 seconds ...'
     time.sleep(2)
     print 'Starting ...'
 
     # 2. detect a face, display it, and get confirmation from user.
     for f in camera.capture_continuous(rawCapture, format='bgr', use_video_port=True):
+        
+        # Get image array from frame
         frame = f.array
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # TODO: use face detector to get faces
+        # Be sure to save the faces in a variable called 'faces'
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
 
         for (x, y, w, h) in faces:
@@ -82,21 +96,25 @@ def main():
                 
                 print 'New result found!'
 
-                # TODO: display on face image
+                # TODO: Display label on face image
+                # Save what you want to write on image to 'result_to_display'
+                # [OPTIONAL]: At this point you only have a number to display, 
+                # you could add some extra code to convert your number to a 
+                # name
 
                 cv2.putText(frame, result_to_display, (10, 30), FONT, 1, (0, 255, 0), 2)
                 cv2.imshow('Face Image for Classification', frame)
                 cv2.waitKey(0)
                 cv2.destroyAllWindows()
                 cv2.waitKey()
-                # remove result
                 break
 
+        # Delete image in variable so we can get the next frame
         rawCapture.truncate(0)
         print 'Waiting for image...'
         time.sleep(1)
     return
 
-
+# Runs main if this file is run directly
 if(__name__ == '__main__'):
     main()
