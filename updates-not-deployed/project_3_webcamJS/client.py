@@ -12,9 +12,11 @@ import time,cv2, base64, requests
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
+# Font that will be written on the image
+FONT = cv2.FONT_HERSHEY_SIMPLEX
+
 # TODO: declare useful paths here if you plan to use them
 CASCADE_PATH = "/home/pi/opencv-2.4.13.4/data/haarcascades/haarcascade_frontalface_default.xml"
-FONT = cv2.FONT_HERSHEY_SIMPLEX
     
 def request_from_server(img):
     """ 
