@@ -1,128 +1,149 @@
 """
+server.py
+
 ECE196 Face Recognition Project
-Author: W Chen
+Author: Will Chen, Simon Fong
 
 What this script should do:
-0. assume the local host is already connected to ec2 instance
-1. load model with saved weights
-2. use a loop to do:
-    2.1. check if a new face image is saved in IMG_SRC_DIR.
-    2.2. process and classify the image
-    2.3. save the classification result in RESULT_DIR.
+1. Load a model with saved weights.
+2. Create a webserver.
+3. Handle classification requests:
+    3.1 Save the image from the request.
+    3.2 Load the image and classify it.
+    3.3 Send the label and confidence back to requester(Pi).
+
+Installation:
+    pip install numpy keras tensorflow h5py flask flask-cors
 """
-
-
-import glob, os, time, cv2
+import cv2
 import numpy as np
 from keras.models import load_model
+from flask import Flask, request, jsonify, g, abort, send_from_directory
+from flask_cors import CORS
 
-# TODO: some parameters you might use
-IMG_SRC_DIR = '/home/ubuntu/facialRecognition/fromPi/'  # ec2
-RESULT_DIR = 'serverResult/'  # ec2
-RESULT_FILE_NAME = 'result.txt'
+app = Flask(__name__)
+CORS(app)                               # Allow CORS (Cross Origin Requests)
 
 
-def check_new_file(path):
+# Read saved weights and name it model
+def get_model():
     """
-    check if a new file is available in the given directory
-    :param path: path of the directory to check
-    :return: path of the file if available; None if not available
+    Retrieves and returns the model. Handles global with flask.
+    :return: model
     """
-    new_file_path = None
-    file_path = os.path.join(path,'*')
-    file_list = sorted(glob.glob(file_path))
-    if len(file_list) == 1:
-        new_file_path = file_list[0]
-    return new_file_path
+    model = getattr(g, 'model', None)
+    if model is None:
+        model = g.model = load_model('face_recognition_weights.h5')
+    return model
 
-
-def classify(file_path, model):
+def classify(file_path):
     """
     classify a face image
     :param file_path: path of face image
-    :param model: model to use
     :return: classification results label and confidence
     """
+    
+    # Image dimensions that the model expects
     img_height, img_width, num_channel = 224, 224, 3
     mean_pixel = np.array([104., 117., 123.]).reshape((1, 1, 3))
 
-    # TODO: use opencv to read and resize image to standard dimensions
-    # TODO: subtract mean_pixel from that image, name the final image as new_img
-    #CHECK
+    # TODO: Use opencv to read and resize image to standard dimensions
     img = cv2.imread(file_path)
-    print(img.shape)
-    img = cv2.resize(img, (224,224))
+    resized_img = cv2.resize(img, (224,224))
 
-    new_img = img - mean_pixel
+    # TODO: Subtract mean_pixel from the image store the new image in 
+    # a variable called 'normalized_image'
+    normalized_image = resized_img - mean_pixel
+    
+    # Turns shape of (2,) to (1,2)
+    expanded_image = np.expand_dims(normalized_image, axis=0)
 
-    x = np.expand_dims(new_img, axis=0)
+    # TODO: Use network to predict x, get label and confidence of prediction
+    # Label is a number, which corresponds to the same number you give to 
+    # the folder when you organized data
+    
+    # TODO: Get the model.
+    model = get_model()
+    
+    # TODO: Use network to predict the 'image_to_be_classified' and
+    # get an array of prediction values
+    # Note: model.predict() returns an array of arrays ie. [[classes]]
+    predictions = model.predict(expanded_image)[0]
+    
+    # TODO: Get the predicted label which is defined as follows:
+    # Label = the index of the largest value in the prediction array
+    # This label is a number, which corresponds to the same number you 
+    # give to the folder when you organized data
+    # Hint: np.argmax
+    label = np.argmax(predictions)
+    
+    # TODO: Calculate confidence according to the following metric:
+    # Confidence = prediction_value / sum(all_prediction_values)
+    # Be sure to call your confidence value 'conf'
+    # Hint: np.sum()
+    label_value = predictions[label]
+    total = np.sum(predictions)
+    conf = label_value/total
+    
+    labels_to_names = {17: 'Simon',
+                       18: 'Tyler'}
 
-    # TODO: use network to predict x, get label and confidence of prediction
-    # TODO: label is a number, which correspond to the same number you give to the folder when you organized data
-    # CHECK
-    probabilities = model.predict(x)[0]
-    print(probabilities)
-    print(type(probabilities))
-    maxIndex = None
-    maxValue = 0
-    total = 0
-
-    for index,num in enumerate(probabilities):
-        if num > maxValue:
-            maxIndex = index
-            maxValue = num
-        total += num
-
-    conf = maxValue/total
-    label = maxIndex
-
-    return label, conf
-
-
-def write_result(label, conf):
-    """
-    write label and confidence to a txt file
-    :param label: predicted class
-    :param conf: confidence of prediction
-    """
-    # open file to write in
-    result_file = open(os.path.join(RESULT_DIR, RESULT_FILE_NAME), 'w')
-    # TODO: convert the label to a name. Eg. if the label of your face is 20, save your name as "name"
-    labels = {17: 'Simon',
-              18: 'Tyler'}
-
-    if label in labels:
-        name = labels[label]
+    if(label in labels_to_names):
+        name = labels_to_names[label]
     else:
         name = "Unknown"
+    
+    prediction = {'label': name,
+                  'confidence': float(conf)}   #Convert to be JSON serializable
 
-    result = ','.join([name, str(conf)])
-    result_file.write(result)
-    result_file.close()
-    return
+    return prediction
 
+@app.route('/')
+def index():
+    """
+    Handles sending the webcam tool.
+    """
+    return send_from_directory('.','index.html')
 
+@app.route('/predict', methods=['GET','POST'])
+def predict():
+    """Receives an image, classifies the image, and responds with the label."""
+    
+    image = None
+    
+    # This extracts the image data from the request 
+    if(request.method == 'POST'):
+        if('image' not in request.form and 'image' not in request.json):
+            print(request.form)
+            abort(400)
+        try:    
+            image = request.json['image']
+        except(TypeError):
+            image = request.form['image']
+
+    starter = image.find(',')
+    image_data = image[starter+1:]
+    
+    # Path where the image will be saved
+    temp_image_name = 'image.jpg'
+    
+    # Decodes the image data and saves the image to disk 
+    with open(temp_image_name, 'wb') as fh:
+        fh.write(image_data.decode('base64'))
+        
+    # TODO: Call classify to predict the image and save the result to a 
+    # variable called 'prediction'
+    prediction = classify(temp_image_name)
+    
+    # Converts python dictionary into JSON format
+    prediction_json = jsonify(prediction)
+    
+    # Respond to the request (Send prediction back to Pi)    
+    return prediction_json
+        
 def main():
-    # TODO: read saved weights and name it model
-    model = load_model('side_hoe_number_2.h5')
-    model.summary()
-
-    print 'Starting ...'
-
-    # TODO: use a loop to check for file
-    while True:
-        # TODO: check if a new face image is saved
-	file_path = check_new_file(IMG_SRC_DIR)
-        # TODO: if new face image available, classify it and save result to a txt file
-        if file_path is not None:
-            label, conf = classify(file_path, model)
-            write_result(label, conf)
-        # TODO: wait for 10 seconds (by then, the result should've been fetched by RPi) and delete image and result files
-            time.sleep(10)
-            os.remove(IMG_SRC_DIR+'new_face.jpg')
-            os.remove(RESULT_DIR+RESULT_FILE_NAME)
-        time.sleep(1)
+    app.run(host='0.0.0.0', port=8080, threaded=False, debug=True)
 
 
-if __name__ == "__main__":
+if(__name__ == "__main__"):
     main()
