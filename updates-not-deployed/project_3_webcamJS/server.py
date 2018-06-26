@@ -27,6 +27,10 @@ CORS(app)                               # Allow CORS (Cross Origin Requests)
 
 # Read saved weights and name it model
 def get_model():
+    """
+    Retrieves and returns the model. Handles global with flask.
+    :return: model
+    """
     model = getattr(g, 'model', None)
     if model is None:
         model = g.model = load_model('face_recognition_weights.h5')
