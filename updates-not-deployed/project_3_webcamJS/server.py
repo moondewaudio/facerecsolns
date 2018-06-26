@@ -45,11 +45,11 @@ def classify(file_path):
 
     # TODO: Use opencv to read and resize image to standard dimensions
     img = cv2.imread(file_path)
-    img = cv2.resize(img, (224,224))
+    resized_img = cv2.resize(img, (224,224))
 
     # TODO: Subtract mean_pixel from the image store the new image in 
     # a variable called 'normalized_image'
-    normalized_image = img - mean_pixel
+    normalized_image = resized_img - mean_pixel
     
     # Turns shape of (2,) to (1,2)
     expanded_image = np.expand_dims(normalized_image, axis=0)
