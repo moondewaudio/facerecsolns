@@ -80,23 +80,23 @@ def main():
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
 
         for (x, y, w, h) in faces:
-            print '=================================='
-            print 'Face detected!'
+            print('==================================')
+            print('Face detected!')
             cv2.imshow('Face Image for Classification', frame)
             cv2.waitKey(2000)
             cv2.destroyAllWindows()
             cv2.waitKey()
             answer = input('Confirm image (1-yes / 0-no): ')
-            print '=================================='
+            print('==================================')
 
             if answer == 1:
-                print 'Let\'s see who you are...'
+                print('Let\'s see who you are...')
                 # TODO: get new result path and get name and confidence
                 data = request_from_server(img)
                 result_to_display = data['label']
                 conf = data['confidence']
                 
-                print 'New result found!'
+                print('New result found!')
 
                 # TODO: Display label on face image
                 # Save what you want to write on image to 'result_to_display'
@@ -113,7 +113,7 @@ def main():
 
         # Delete image in variable so we can get the next frame
         rawCapture.truncate(0)
-        print 'Waiting for image...'
+        print('Waiting for image...')
         time.sleep(1)
     return
 
