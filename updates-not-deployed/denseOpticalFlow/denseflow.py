@@ -5,6 +5,11 @@ POINT_DIST = 8                                                                  
 flagMarker = False
 DEFAULT_VIDEO = 'vtest.avi'
 
+def is_opencv_2():
+    ver = cv2.__version__
+    num = int(ver.split('.')[0])
+    return num == 2
+
 
 # Try using webcam
 cap = cv2.VideoCapture(0)                                                                              # init camera (if 0 as argument) /video (if filename as argument)
@@ -27,7 +32,12 @@ try:
     while(True):
         ret, frame2 = cap.read()                                                                            # capture next frame
         next = cv2.cvtColor(frame2,cv2.COLOR_BGR2GRAY)                                                      # convert next frame into bgr colorspace
-        flow = -1 * cv2.calcOpticalFlowFarneback(prvs,next, None, 0.5, 3, 15, 3, 5, 1.2, 0)                 # calculate flow between all points
+        # Handle OpenCV 2
+        if(is_opencv_2()):
+            flow = -1 * cv2.calcOpticalFlowFarneback(prvs,next, 0.5, 3, 15, 3, 5, 1.2, 0)
+        # Handle OpenCV 3
+        else:
+            flow = -1 * cv2.calcOpticalFlowFarneback(prvs,next, None, 0.5, 3, 15, 3, 5, 1.2, 0)                 # calculate flow between all points
         mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])                                                # convert flow values into polar values (for color repr) 
         hsv[...,0] = ang*180/np.pi/2                                                                        # hue represented in radians in OpenCV
         hsv[...,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)                                          # normalize vibrance (our polar magnitude) between 0-255
