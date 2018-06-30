@@ -105,6 +105,40 @@ def index():
     """
     return send_from_directory('.','index.html')
 
+# Persons seen list. Contains prediction dictionaries of label and confidence.
+persons = []
+
+@app.route('/person/<person>')
+def get_person(person):
+
+    # Default prediction to return. If nobody has been logged yet.
+    prediction = {'error': 'No body seen yet.'}
+
+    # Default index
+    index = 0
+
+    # Handle specific index
+    try:
+        index = int(person)
+    except ValueError as e:
+        print("Exception: {}".format(e))
+
+    # Handle last person
+    if(person == 'last'):
+        index = -1
+    
+    # Handle out of bounds.
+    try:
+         prediction = persons[index]
+    except IndexError as e:
+        print("Exception: {}".format(e))
+
+    # Converts python dictionary into JSON format
+    prediction_json = jsonify(prediction)
+    
+    # Respond to the request (Send prediction back to Pi)    
+    return prediction_json
+
 @app.route('/predict', methods=['GET','POST'])
 def predict():
     """Receives an image, classifies the image, and responds with the label."""
@@ -134,6 +168,9 @@ def predict():
     # TODO: Call classify to predict the image and save the result to a 
     # variable called 'prediction'
     prediction = classify(temp_image_name)
+
+    # Add to persons list
+    persons.append(prediction)
     
     # Converts python dictionary into JSON format
     prediction_json = jsonify(prediction)
