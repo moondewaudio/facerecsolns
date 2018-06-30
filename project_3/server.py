@@ -115,11 +115,12 @@ def get_person(person):
     prediction = {'error': 'No body seen yet.'}
 
     # Default index
-    index = 0
+    index = None
 
     # Handle specific index
     try:
         index = int(person)
+
     except ValueError as e:
         print("Exception: {}".format(e))
 
@@ -131,6 +132,10 @@ def get_person(person):
     try:
          prediction = persons[index]
     except IndexError as e:
+        # When index is not in range.
+        print("Exception: {}".format(e))
+    except TypeError as e:
+        # When index is None
         print("Exception: {}".format(e))
 
     # Converts python dictionary into JSON format
