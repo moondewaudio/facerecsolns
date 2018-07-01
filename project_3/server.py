@@ -183,9 +183,14 @@ def predict():
     # Respond to the request (Send prediction back to Pi)    
     return prediction_json
         
-def main():
-    app.run(host='0.0.0.0', port=8080, threaded=False, debug=True)
+def main(args):
+    app.run(host='0.0.0.0', port=args.port, threaded=False, debug=args.debug)
 
 
 if(__name__ == "__main__"):
-    main()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p','--port', help="Port that the server will run on.", type=int, default=8080)
+    parser.add_argument('-d','--debug', help="Whether or not to run in debug mode.", default=False, action='store_true')
+    args = parser.parse_args()
+    main(args)
