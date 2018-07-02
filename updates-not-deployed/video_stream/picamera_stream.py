@@ -34,7 +34,7 @@ class PiCameraStream:
     def get_frame(self):
         """ Retrieve frame. """
         # Read until video is completed
-        for f in camera.capture_continuous(self.raw_capture, format='bgr', use_video_port=True):
+        for f in self.stream.capture_continuous(self.raw_capture, format='bgr', use_video_port=True):
             frame = f.array
             yield frame
 
