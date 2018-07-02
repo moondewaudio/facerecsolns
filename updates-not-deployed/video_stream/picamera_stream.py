@@ -53,8 +53,8 @@ def _main(args):
 if(__name__ == '__main__'):
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w','--height',help='Specify width.', type=int, default=640)
-    parser.add_argument('-h','--width',help='Specify heigh.t', type=int, default=480)
+    parser.add_argument('-cw','--width',help='Specify width.', type=int, default=640)
+    parser.add_argument('-ch','--height',help='Specify height', type=int, default=480)
     parser.add_argument('-r','--rotation',help='Specify rotation.', type=int, default=180)
     args = parser.parse_args()
     _main(args)
