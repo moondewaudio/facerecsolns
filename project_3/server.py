@@ -110,6 +110,15 @@ persons = []
 
 @app.route('/person/<person>')
 def get_person(person):
+    """ Handles returning persons last seen.
+
+    If a integer is given, return the the person in that index of the array.
+    If the string 'last', return the last person seen.
+    If anything else, return an error.
+
+    :param person: index | last | other
+    :return: prediction | error
+    """
 
     # Default prediction to return. If nobody has been logged yet.
     prediction = {'error': 'No body seen yet.'}
