@@ -25,13 +25,9 @@ class CameraStream:
 
     def __del__(self):
         """ Destructor to close everything. """
-        from cv2 import destroyAllWindows
-		
         # When everything done, release the video capture object    
         self.stream.release()
 		 
-        # Closes all the frames
-        destroyAllWindows()
 
     def get_frame(self):
         """ Retrieve frame. """
