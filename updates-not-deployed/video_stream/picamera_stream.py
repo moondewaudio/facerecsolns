@@ -37,6 +37,7 @@ class PiCameraStream:
         for f in self.stream.capture_continuous(self.raw_capture, format='bgr', use_video_port=True):
             frame = f.array
             yield frame
+            self.raw_capture.truncate(0)
 
 def _main(args):
     import cv2
