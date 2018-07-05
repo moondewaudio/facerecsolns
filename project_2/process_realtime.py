@@ -18,8 +18,8 @@ camera.resolution = (640, 480)
 camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(640, 480))
 
-face_cascade = cv2.CascadeClassifier('/home/pi/opencv-2.4.13.4/data/haarcascades/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier('/home/pi/opencv-2.4.13.4/data/haarcascades/haarcascade_eye.xml')
+face_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_eye.xml')
  
 
 time.sleep(0.1)
