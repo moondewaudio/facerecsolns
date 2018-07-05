@@ -5,23 +5,6 @@ from picamera import PiCamera
 import time
 import cv2
 
-#center is a tuple
-##Ex: (100,100)
-def drawRectangle(image,center):
-    '''
-    height,width = resized.shape
-
-    top = (width/2-50, height/2-50)
-    bottom = (width/2+50, height/2+50)
-
-    cv2.rectangle(resized, top, bottom, (255,255,255),3)
-
-   top = None
-    bottom = None
-    cv2.rectangle(image, top, bottom, (255,2555,255), 3)
-    '''
-    pass
-
 # initialize the camera and grabreference
 camera = PiCamera()
 camera.resolution = (640, 480)
