@@ -1,4 +1,12 @@
+# Model weights
 **.h5
+
+# Compiled python files
 **.pyc
+
+# Python Environments
 **env
+
+# Random image files
 **image.jpg
+**temp.jpg
