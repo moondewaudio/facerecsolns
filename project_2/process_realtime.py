@@ -1,3 +1,10 @@
+"""
+process_realtime.py
+
+Detects faces in realtime and displays them.
+
+Author: Simon Fong
+"""
 
 
 from picamera.array import PiRGBArray
