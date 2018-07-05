@@ -51,7 +51,7 @@ def request_from_server(img):
     return prediction
 
 
-def main():
+def _main():
     # 1. start running the camera.
     # TODO: initialize face detector
     face_cascade = cv2.CascadeClassifier(CASCADE_PATH)
@@ -119,4 +119,4 @@ def main():
 
 # Runs main if this file is run directly
 if(__name__ == '__main__'):
-    main()
+    _main()
