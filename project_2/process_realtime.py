@@ -5,23 +5,26 @@ Detects faces in realtime and displays them.
 
 Author: Simon Fong
 """
+def set_path():
+    """ Used to get the library path. """
+    import os, sys
+    path_of_file = os.path.abspath(os.path.dirname(__file__))
+    repo_path = os.path.join(path_of_file,'../lib')
+    sys.path.append(repo_path)
 
+# Setting path to find custom library.
+set_path()
 
-from picamera.array import PiRGBArray
-from picamera import PiCamera
 import cv2
+from video_stream.video_stream import VideoStream
 
-# initialize the camera and grabreference
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(640, 480))
+# Initialize the camera and grabreference
+camera = VideoStream(picamera=False)
 
 face_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier('..g/haarcascades/haarcascade_eye.xml')
+eye_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_eye.xml')
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    image = frame.array
+for image in camera.get_frame():
     
     gray = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
     
@@ -42,8 +45,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     cv2.imshow("Frame", resized)
     key = cv2.waitKey(1) & 0xFF
 
-
-    rawCapture.truncate(0)
 
     if key == ord("q"):
         break
