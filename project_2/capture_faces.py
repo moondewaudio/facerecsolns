@@ -1,8 +1,9 @@
-
 """
-NOTE: This should be in the student code, but is not necesaary because of the video_stream library.
-from picamera.array import PiRGBArray
-from picamera import PiCamera
+capture_faces.py
+
+Captures face images and stores them.
+
+Author: Simon Fong
 """
 def set_path():
     """ Used to get the library path. """
@@ -13,95 +14,83 @@ def set_path():
 
 # Setting path to find custom library.
 set_path()
-
-import time
+ 
 import cv2
 import os
-import sys
 from video_stream.video_stream import VideoStream
 
+def _main(args):
+    person = args.person
+    numImages = args.count
 
-#center is a tuple
-##Ex: (100,100)
-def drawRectangle(image,center):
-    '''
-    height,width = resized.shape
+    face_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_frontalface_default.xml')
+    eye_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_eye.xml')
 
-    top = (width/2-50, height/2-50)
-    bottom = (width/2+50, height/2+50)
+    # Custom Video Stream library
+    cam = VideoStream(picamera=not args.webcam)
 
-    cv2.rectangle(resized, top, bottom, (255,255,255),3)
+    # Make the directory to store the images if it doesn't exist.
+    if not os.path.exists(person):
+        os.mkdir(person)
 
-   top = None
-    bottom = None
-    cv2.rectangle(image, top, bottom, (255,2555,255), 3)
-    '''
-    pass
+    # Track how many images recorded.
+    count = 0
 
-"""
-NOTE: This should be in the student code, but is not necesaary because of the video_stream library.
-# initialize the camera and grabreference
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(640, 480))
-"""
+    # Get images from the camera.
+    for image in cam.get_frame():
 
-face_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_eye.xml')
- 
-
-time.sleep(0.1)
-
-i = 0
-
-person = str(sys.argv[1])
-numImages = int(sys.argv[2])
-
-"""
-NOTE: This should be in the student code, but is not necesaary because of the video_stream library.
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    image = frame.array
-"""
-# Custom Video Stream library
-cam = VideoStream()
-
-for image in cam.get_frame():
-    gray = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
-    
-    resized = cv2.resize(gray, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_CUBIC)
-    
-      
-    faces = face_cascade.detectMultiScale(resized, 1.3, 5)
-    
-
-    for (x,y,w,h) in faces:
-        dirname = person
-        picName = os.path.join(dirname,person)+'_' + str(i).zfill(2) + '.jpg'
-
-        if i < numImages:
-            cv2.imwrite(picName, gray)
-            print("FACE")
-            i += 1
-        else:
-            exit()
+        # Convert to grayscale
+        gray = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
         
-        cv2.rectangle(resized,(x,y),(x+w,y+h),(255,255,255),2)
-        roi_gray = gray[y:y+h, x:x+w]
-        roi_color = gray[y:y+h, x:x+w]
-        eyes = eye_cascade.detectMultiScale(roi_gray)
-        for (ex,ey,ew,eh) in eyes:
-            cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(255,255,255),2)
-    
-   
-    cv2.imshow("Frame", resized)
-    key = cv2.waitKey(1) & 0xFF
+        # Resize by 0.25
+        resized = cv2.resize(gray, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_CUBIC)
+        
+        # Detect faces  
+        faces = face_cascade.detectMultiScale(resized, 1.3, 5)
+        
+        # Draw a box on each face
+        for (x,y,w,h) in faces:
+            # Format image name
+            dirname = person
+            image_name = "{person}_{count:02}.jpg".format(person=person,count=count)
+            image_path = os.path.join(dirname,image_name)
 
-    """
-    NOTE: This should be in the student code, but is not necesaary because of the video_stream library.
-    rawCapture.truncate(0)
-    """
+            # Save the image.
+            cv2.imwrite(image_path, gray)
+            print("Face Detected {count:02}/{total:02}".format(count=count+1,total=numImages))
+            count += 1
+            
+            # Draw the rectangle on the face.
+            cv2.rectangle(resized,(x,y),(x+w,y+h),(255,255,255),2)
+            roi_gray = gray[y:y+h, x:x+w]
+            roi_color = gray[y:y+h, x:x+w]
+            eyes = eye_cascade.detectMultiScale(roi_gray)
 
-    if key == ord("q"):
-        break
+            # Draw rectangle on the eyes.
+            for (ex,ey,ew,eh) in eyes:
+                cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(255,255,255),2)
+        
+        # Show the image.
+        cv2.imshow("Frame", resized)
+        
 
+        # If we captured enough images.
+        if(count >= numImages):
+            break
+
+        # Wait one second and exit if 'q' is pressed.
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
+
+if(__name__ == '__main__'):
+    import argparse
+    parser = argparse.ArgumentParser()
+
+    # Flag to whether to use PiCamera
+    parser.add_argument('-web','--webcam',help='Specify to use webcam.',default=False,action='store_true')
+    parser.add_argument('-p','--person', help='Name to label the images.',default='simon')
+    parser.add_argument('-c','--count', help='Number of images to collect.',default=10,type=int)
+
+    args = parser.parse_args()
+    _main(args)
