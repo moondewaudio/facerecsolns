@@ -19,10 +19,7 @@ camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(640, 480))
 
 face_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier('../haarcascades/haarcascade_eye.xml')
- 
-
-time.sleep(0.1)
+eye_cascade = cv2.CascadeClassifier('..g/haarcascades/haarcascade_eye.xml')
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     image = frame.array
