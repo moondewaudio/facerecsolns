@@ -18,23 +18,15 @@ Installation:
 import cv2
 import numpy as np
 from keras.models import load_model
-from flask import Flask, request, jsonify, g, abort, send_from_directory
+from flask import Flask, request, jsonify, abort, send_from_directory
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)                               # Allow CORS (Cross Origin Requests)
 
+# TODO: Load the model from the weights file.
+MODEL = load_model('face_recognition_weights.h5')
 
-# Read saved weights and name it model
-def get_model():
-    """
-    Retrieves and returns the model. Handles global with flask.
-    :return: model
-    """
-    model = getattr(g, 'model', None)
-    if model is None:
-        model = g.model = load_model('face_recognition_weights.h5')
-    return model
 
 def classify(file_path):
     """
@@ -62,13 +54,11 @@ def classify(file_path):
     # Label is a number, which corresponds to the same number you give to 
     # the folder when you organized data
     
-    # TODO: Get the model.
-    model = get_model()
     
     # TODO: Use network to predict the 'image_to_be_classified' and
     # get an array of prediction values
-    # Note: model.predict() returns an array of arrays ie. [[classes]]
-    predictions = model.predict(expanded_image)[0]
+    # Note: MODEL.predict() returns an array of arrays ie. [[classes]]
+    predictions = MODEL.predict(expanded_image)[0]
     
     # TODO: Get the predicted label which is defined as follows:
     # Label = the index of the largest value in the prediction array
