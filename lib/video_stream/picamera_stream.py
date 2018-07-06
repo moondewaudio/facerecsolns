@@ -9,8 +9,14 @@ Author: Simon Fong
 
 class PiCameraStream:
     def __init__(self,width=640,height=480,rotation=180):
-        from picamera import PiCamera
-        from picamera.array import PiRGBArray
+        try:
+            from picamera import PiCamera
+            from picamera.array import PiRGBArray
+        except ImportError as e:
+            print(' IMPORTANT '.center(80, '*'))
+            print("If you are NOT on a Pi, set the '-web' flag or specify webcam.")
+            print(''.center(80, '*'))
+            raise e
 
         # Init PiCamera
         self.stream = PiCamera()
