@@ -13,11 +13,6 @@ class Visualizer:
         self.x = x      # Data
         self.y = y      # Target
 
-    def __del__(self):
-        """ Destructor to close everything. """
-        # When everything done, release the video capture object
-        pass  
-
     def visualize(self,index):
         img = self.x[index]
         label = str(self.y[index])
