@@ -1,5 +1,5 @@
 """
-predict.py
+predict_cnn_mnist.py
 
 Predict MNIST images using a trained neural network.
 
@@ -7,8 +7,7 @@ ECE196 Face Recognition Project
 Author: Simon Fong
 """
 # TODO: Import other layers as necessary. (Conv2D, MaxPooling2D)
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D
-from keras.models import Model
+from keras.models import load_model
 from keras.datasets import mnist
 from keras.utils import to_categorical
 import keras
@@ -40,6 +39,33 @@ def _main(args):
     # Reshape to fit model
     y_train = np.reshape(y_train,(60000,1,1,10))
     y_test = np.reshape(y_test,(10000,1,1,10))
+
+    # Grab the first 10 images and labels
+    images = x_test[:10]
+    labels = y_test[:10]
+
+    # Load the model
+    model = load_model('yann_mnist.h5')
+
+    # Predict and show each image
+    for image,label in zip(images,labels):
+        # Expands shape from (32,32,1) to (1,32,32,1)
+        expanded_image = np.expand_dims(image,axis=0)
+
+        # Uses model to predict
+        predictions = model.predict(expanded_image)[0]
+        
+        # Find the index of largest value to get digit
+        predicted_label = np.argmax(predictions)
+        truth_label = np.argmax(label)
+        
+        # Show the image
+        title = "Predicted: {}, Truth: {}".format(predicted_label, truth_label)
+        print(title)
+        cv2.imshow(title,image)
+        cv2.waitKey()
+        cv2.destroyAllWindows()
+
 
 if(__name__ == '__main__'):
     import argparse
