@@ -45,8 +45,11 @@ Modify this code to write a LeNet with the following requirements:
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D
 from keras.models import Model
 from keras.datasets import mnist
+from keras.utils import to_categorical
+import keras
 import numpy as np
 import cv2
+import os
 
 # Load MNIST dataset.
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -59,6 +62,18 @@ def procces_image(img):
 x_train = np.array(map(procces_image, x_train))
 x_test = np.array(map(procces_image, x_test))
 print("Resized images to {}".format(x_train.shape))
+
+x_train = np.reshape(x_train,(60000,32,32,1))
+x_test = np.reshape(x_test,(10000,32,32,1))
+print(x_train.shape)
+
+# One hot encode labels.
+y_train = to_categorical(y_train)
+y_test = to_categorical(y_test)
+y_train = np.reshape(y_train,(60000,1,1,10))
+y_test = np.reshape(y_test,(10000,1,1,10))
+print(y_train.shape)
+
 
 # TODO: Currently, sets input dimension to be 784x1. Change to 32x32x1
 inputs = Input(shape=(32,32,1))
@@ -76,5 +91,27 @@ model = Model(inputs=inputs, outputs=predictions)
 
 # Print model architecture
 model.summary()
+
+# Compile model
+optimizer = keras.optimizers.SGD(lr=1e-4,momentum=0.9)
+model.compile(optimizer,'categorical_crossentropy', metrics=['accuracy'])
+
+# Setting for training.
+NUM_EPOCHS = 20
+BATCH_SIZE = 16
+
+# Train the model.
+model.fit(x=x_train,y=y_train,batch_size=BATCH_SIZE,epochs=NUM_EPOCHS)
+
+# Save the model.
+model.save('yann_mnist.h5')
+
+# Test the model.
+metrics = model.evaluate(x=x_test,y=y_test, batch_size=BATCH_SIZE)
+
+# Print out the accuracy.
+print("{metrics_names[0]}: {metrics[0]} \n {metrics_names[1]}: {metrics[1]}".format(metrics=metrics, 
+	metrics_names=model.metrics_names))
+
 
 
