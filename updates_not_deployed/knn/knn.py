@@ -74,13 +74,9 @@ class KNN:
 
         for (x_1_e, x_2_e) in zip(x_1, x_2):
             distance += abs(x_2_e - x_1_e)
-
         return distance
 
-
-
-def _main(args):
-
+def _main_iris(args):
     # Load dataset
     from sklearn.datasets import load_iris
     data = load_iris()
@@ -102,6 +98,95 @@ def _main(args):
     x_predict = [5,5,5,5]
     y_predict = knn.predict(x_predict)
     print(y_predict)
+    print(y_predict)
+
+def _main_mnist(args):
+    import cv2
+    import numpy as np
+
+    # Load dataset
+    from keras.datasets import mnist
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    
+    # Vectorize and to float data from np format
+    x_train_v = vectorize(x_train)
+    x_train_v = to_float(x_train_v)
+    print("x train data formatted.")
+
+    x_test_v = vectorize(x_test)
+    x_test_v = to_float(x_test_v)
+    print("x train data formatted.")
+
+    y_train_v = to_float(y_train,label=True)
+    print("y data formatted.")
+
+    #cv2.imshow('Orignal',x_train[0])
+    #cv2.imshow('Shaped',unshaped_x[0])
+    #cv2.waitKey()
+
+    # Create KNN
+    knn = KNN()
+
+    # Train with data.
+    knn.train(x_train_v,y_train_v)
+
+    # Do a test prediction.
+    print("Begin predicting.")
+    tests = 10
+    for i in range(tests):   
+        x_predict = x_test_v[i]
+        y_predict = knn.predict(x_predict)
+        y_correct = float(y_test[i])
+        correct = False
+        if(y_predict == y_correct):
+            correct = True
+        message = "Predicted: {predict}, Truth: {truth}, {}".format(correct,
+            predict=y_predict,
+            truth=y_correct)
+        print(message)
+
+def vectorize(data,single=False):
+    import numpy as np
+
+    # Handle all data
+    if not single:
+        (num_images,rows,cols) = data.shape
+        return np.reshape(data,(num_images,rows*cols))
+    
+    # Handle a single image
+    (rows,cols) = data.shape
+    return np.reshape(data,(rows*cols))
+
+def devectorize(data,shape,single=False):
+    import numpy as np
+
+    # Handle all data
+    if not single:
+        (num_images,num_elem) = data.shape
+        return np.reshape(data,(num_images,shape[0],shape[1]))
+    
+    # Handle a single image
+    (rows,cols) = data.shape
+    return np.reshape(data,(rows*cols))
+
+def to_float(data,label=False):
+    # Handle x data
+    if not label:
+        # Convert from numpy arrays to lists.
+        x_train = [ list(x) for x in list(data)]
+        # Convert from numpy.float to float.
+        x_train = [[float(e) for e in x] for x in x_train]
+        return x_train
+
+    # Handle labels
+    y_train = list(data)
+    return y_train
+
+def _main(args):
+    _main_mnist(args)
+
+    
+
 
     
     
