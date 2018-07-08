@@ -45,9 +45,17 @@ Modify this code to write a LeNet with the following requirements:
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D
 from keras.models import Model
 from keras.datasets import mnist
+import cv2
 
 # Load MNIST dataset.
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+# Proccess the data from (28,28) to (32,32)
+def procces_image(img):
+	proccesed_image = cv2.resize(img, (32,32))
+	return proccesed_image
+
+x_train = map(procces_image, x_train)
 
 # TODO: Currently, sets input dimension to be 784x1. Change to 32x32x1
 inputs = Input(shape=(32,32,1))
