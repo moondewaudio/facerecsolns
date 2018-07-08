@@ -68,7 +68,6 @@
                              navigator.msGetUserMedia);
 
       var video;
-      var webcamStream;
 
       function startWebcam() {
         if (navigator.getUserMedia) {
@@ -82,9 +81,8 @@
 
               // successCallback
               function(localMediaStream) {
-                  video = document.querySelector('video');
-                 video.src = window.URL.createObjectURL(localMediaStream);
-                 webcamStream = localMediaStream;
+                 video = document.querySelector('video');
+                 video.srcObject = localMediaStream;
               },
 
               // errorCallback
@@ -98,7 +96,8 @@
       }
 
       function stopWebcam() {
-          webcamStream.stop();
+          video.srcObject.getVideoTracks()[0].stop();
+          
       }
       //---------------------
       // TAKE A SNAPSHOT CODE
