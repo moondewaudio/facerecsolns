@@ -18,7 +18,6 @@ set_path()
 import cv2
 import os
 import numpy as np
-from keras.utils import to_categorical
 
 def detect_face(img):
     """ From: https://github.com/informramiz/opencv-face-recognition-python"""
@@ -80,7 +79,7 @@ def collect_faces(person,num_images):
             image_name = "{person}_{count:02}.jpg".format(person=person,count=count)
             image_path = os.path.join(dirname,image_name)
 
-            cropped = gray[y:y+w,x:x+h]
+            cropped = resized[y:y+w,x:x+h]
             r_cropped = cv2.resize(cropped, (100, 100))
             # Save the image.
             cv2.imwrite(image_path, r_cropped)
@@ -119,20 +118,31 @@ def predict(recognizer,test_img):
     #detect face from the image
     face, rect = detect_face(img)
 
+    if(rect is None):
+        return test_img
+
+    face = cv2.resize(face, (100, 100))
+
     #predict the image using our face recognizer 
     label, confidence = recognizer.predict(face)
     #get name of respective label returned by face recognizer
-    label_text = subjects[label]
+    #label_text = subjects[label]
     
     #draw a rectangle around face detected
     draw_rectangle(img, rect)
     #draw name of predicted person
-    draw_text(img, label_text, rect[0], rect[1]-5)
+    draw_text(img, str(label), rect[0], rect[1]-5)
     
     return img
 
-def train(name):
+def train(name, load=None, save=None):
     face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+
+
+    if(load is not None):
+        face_recognizer.load(load)
+        print("Loading model from {}".format(load))
+        return face_recognizer
 
     images =[]
     labels = []
@@ -149,6 +159,10 @@ def train(name):
 
     face_recognizer.train(images, np.array(labels))
 
+    if(save is not None):
+        face_recognizer.save(save)
+        print("Saved model to {}".format(save))
+
     return face_recognizer
 
 def predict_live(recognizer):
@@ -157,15 +171,19 @@ def predict_live(recognizer):
     while True:
         ret, frame = cam.read()
         predicted_image = predict(recognizer, frame)
-        cv2.imshow(predicted_image)
-        cv2.waitKey(1)
+        cv2.imshow('Face', predicted_image)
+        # Wait one second and exit if 'q' is pressed.
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
 
 def _main(args):
     if(args.cap):
         collect_faces(args.person,args.count)
 
     if(args.train):
-        recognizer = train(args.person)
+        recognizer = train(args.person, load=args.load, 
+            save=args.save)
 
         if(args.predict):
             predict_live(recognizer)
@@ -183,5 +201,7 @@ if(__name__ == '__main__'):
     parser.add_argument('-ca','--cap', help='Whether to capture images.',default=False,action='store_true')
     parser.add_argument('-t','--train', help='Whether to train',default=False,action='store_true')
     parser.add_argument('-pr','--predict', help='Whether to predict',default=False,action='store_true')
+    parser.add_argument('-l','--load', help='Path to load model.',default=None)
+    parser.add_argument('-s','--save', help='Path to save model.',default=None)
     args = parser.parse_args()
     _main(args)
