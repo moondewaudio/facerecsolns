@@ -23,7 +23,7 @@ def _main(args):
     print("Reshaped x data into {}".format(x_train.shape))
 
     # Create KNN
-    knn = SVC(cache_size=2048)
+    svm = SVC(cache_size=2048)
 
 
     start_time = time.time()
