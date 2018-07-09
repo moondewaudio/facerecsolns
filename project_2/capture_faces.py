@@ -56,7 +56,7 @@ def _main(args):
             image_path = os.path.join(dirname,image_name)
 
             # Save the image.
-            cv2.imwrite(image_path, gray)
+            cv2.imwrite(image_path, resized[x:x+h,y:y+w])
             print("Face Detected {count:02}/{total:02}".format(count=count+1,total=numImages))
             count += 1
             
