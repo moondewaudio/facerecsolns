@@ -11,36 +11,41 @@ def _main(args):
     
     import numpy as np
     from sklearn.svm import SVC
-    import time
     
 
     # Load dataset
     from keras.datasets import mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     
+    # Process images
     x_train = np.reshape(x_train,(60000,784))
     x_test = np.reshape(x_test,(10000,784))
     print("Reshaped x data into {}".format(x_train.shape))
 
-    # Create KNN
-    svm = SVC(cache_size=2048)
+    # Subset of training data to reduce training time.
+    # NOTE: This is only 3000/60000. Training with the full set would take too long.
+    SUBSET = 3000
+    x_train = x_train[:SUBSET]
+    y_train = y_train[:SUBSET]
 
-
-    start_time = time.time()
     # Train with data.
     print("Begin fitting...")
-    svm.fit(x_train[:], y_train[:])
-    print("Classifier fitted.")
-    cur = time.time()
-    fit_time = cur - start_time
-    print("Fit time {} seconds".format(fit_time))
 
-    # Do a test prediction.
+    # TODO: Create an SVM with a cache_size=2048
+    svm = SVC(cache_size=2048)
+
+    # TODO: Fit the data
+    # Hint: svm.fit
+    svm.fit(x_train, y_train)
+    print("Classifier fitted.")
+
+    # Evaluate on testing data.
     print("Begin predicting.")
-    acc = svm.score(x_test, y_test)
+
+    # TODO: Evaluate on testing data
+    # Hint: svm.score
+    acc = svm.score(x_test,y_test)
     print("Accuracy: {}".format(acc))
-    predict_time = time.time() - cur
-    print("Prediction time {} seconds".format(predict_time))
 
 
 
