@@ -11,6 +11,8 @@ def _main(args):
     
     import numpy as np
     from sklearn.svm import SVC
+    import time
+    
 
     # Load dataset
     from keras.datasets import mnist
@@ -24,16 +26,22 @@ def _main(args):
     knn = SVC(cache_size=2048)
 
 
+    start_time = time.time()
     # Train with data.
     print("Begin fitting...")
-    knn.fit(x_train[:1000], y_train[:1000])
+    svm.fit(x_train[:], y_train[:])
     print("Classifier fitted.")
-
+    cur = time.time()
+    fit_time = cur - start_time
+    print("Fit time {} seconds".format(fit_time))
 
     # Do a test prediction.
     print("Begin predicting.")
-    acc = knn.score(x_test, y_test)
+    acc = svm.score(x_test, y_test)
     print("Accuracy: {}".format(acc))
+    predict_time = time.time() - cur
+    print("Prediction time {} seconds".format(predict_time))
+
 
 
   
