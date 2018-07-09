@@ -15,6 +15,12 @@ def set_path():
 
 # Setting path to find custom library.
 set_path()
+
+def is_opencv_2():
+    ver = cv2.__version__
+    num = int(ver.split('.')[0])
+    return num == 2
+
 import cv2
 import os
 import numpy as np
@@ -136,8 +142,14 @@ def predict(recognizer,test_img):
     return img
 
 def train(name, load=None, save=None):
-    face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+    face_recognizer = None
 
+    # Handle OpenCV 2
+    if(is_opencv_2()):
+        face_recognizer = cv2.createLBPHFaceRecognizer()
+    # Handle OpenCV 3
+    else:
+        face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 
     if(load is not None):
         face_recognizer.load(load)
