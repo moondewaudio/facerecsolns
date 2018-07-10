@@ -37,6 +37,7 @@
        <button onclick="snapshot();">Take Snapshot</button> 
        <a id="download" download="image.jpg" href=""><button>Download</button></a>
        <button onclick="post_request();">Post Request</button> 
+       <select></select>
     </p>
     <p>
         <input id="endpoint" type=text placeholder="http:localhost:8080/predict">
@@ -69,20 +70,25 @@
 
       var video;
 
+      var constraints = {
+                 video: {deviceId: ''},
+                 audio: false
+
+              };
+
       function startWebcam() {
         if (navigator.getUserMedia) {
            navigator.getUserMedia (
 
               // constraints
-              {
-                 video: true,
-                 audio: false
-              },
+              constraints
+              ,
 
               // successCallback
               function(localMediaStream) {
                  video = document.querySelector('video');
                  video.srcObject = localMediaStream;
+                 console.log(constraints);
               },
 
               // errorCallback
@@ -113,6 +119,7 @@
         var endpoint = window.location.href + 'predict';
         $('#endpoint').attr('placeholder',endpoint);
         $('#endpoint_output').text(endpoint);
+        selectCamera();
       }
       
       var imageURI;
@@ -155,6 +162,33 @@
       
       function setResponseBox(value){
         $('#response_output').text(value.label);
+      }
+
+      function selectCamera(){
+        var select = document.querySelector('select')
+        var option = document.createElement("option");
+        $('select').change(function(){
+          constraints.video.deviceId = this.value;
+          stopWebcam();
+          startWebcam();
+        });
+        
+        navigator.mediaDevices.enumerateDevices()
+        .then(function(devices) {
+          devices.forEach(function(device) {
+            if(device.kind === 'videoinput'){
+              console.log(device);
+              var option = document.createElement("option");
+              option.text = device.label;
+              option.value = device.deviceId;
+              select.add(option);
+            }
+
+          });
+        })
+        .catch(function(err) {
+          console.log(err.name + ": " + err.message);
+        });
       }
 
   </script>
